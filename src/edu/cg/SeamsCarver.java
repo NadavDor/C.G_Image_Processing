@@ -39,6 +39,19 @@ public class SeamsCarver extends ImageProcessor {
 		// TODO: You may initialize your additional fields and apply some preliminary
 		// calculations.
 
+		/* init a matrix (might need to make it as a dynamic matrix) to represent the gradient magnitude
+		 aka the "edges" of the image.
+		 remember: work on the grayscale image and use forward differencing
+		*/
+
+		// init some data structure to store all the k seams.
+
+		// find the 𝑘 most minimal seams
+		for (int i = 0; i < numOfSeams ; i++) {
+			findMinimalSeam();
+		}
+
+
 		this.logger.log("preliminary calculations were ended.");
 	}
 
@@ -46,11 +59,18 @@ public class SeamsCarver extends ImageProcessor {
 		return resizeOp.resize();
 	}
 
+	/*find a minimal seam using the edges matrix
+	 and store it in the DS */
+	private void findMinimalSeam() {
+	}
+
+	// delete all the seams found in the DS from the original image.
 	private BufferedImage reduceImageWidth() {
 		// TODO: Implement this method, remove the exception.
 		throw new UnimplementedMethodException("reduceImageWidth");
 	}
 
+	// duplicate each of the seams found in the DS from the original image.
 	private BufferedImage increaseImageWidth() {
 		// TODO: Implement this method, remove the exception.
 		throw new UnimplementedMethodException("increaseImageWidth");
