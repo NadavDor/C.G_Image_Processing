@@ -130,10 +130,10 @@ public class SeamsCarver extends ImageProcessor {
         for (int y = 0; y < costMat.length ; y++) {
             for (int x = 0; x < costMat[0].length; x++) {
 
-                // fill the first row
-                if (y == 0) {
-                    costMat[y][x] = edges[y].get(x).getPixelEnergy();
-                }
+                costMat[y][x] = edges[y].get(x).getPixelEnergy();
+
+                // fill the first row without considering cl, cv of cr.
+                if (y == 0) continue;
 
 				int cl = 0;
 				int cv = 0;
@@ -141,20 +141,44 @@ public class SeamsCarver extends ImageProcessor {
 
                 //left most pixel in the row
                 if (x == 0){
-					//magnitude = (int)Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
+                    // find how to calc cv here
+                    //cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
+                    cr = (int) ( Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2)) +
+                                 Math.sqrt(Math.pow(this.greyScale[y][x+1] - greyScale[y-1][x], 2)) );
+
+                    costMat[y][x] += Math.min( costMat[y-1][x], costMat[y-1][x+1] + cr);
 				}
                 // right most pixel in the row
                 else if (x == costMat[0].length - 1){
+                    // find how to calc cv here
+                    //cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
+                    cl = (int) ( Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2)) +
+                            Math.sqrt(Math.pow(this.greyScale[y-1][x] - greyScale[y][x-1], 2)) );
+
+                    costMat[y][x] += Math.min( costMat[y-1][x], costMat[y-1][x-1] + cl);
                 }
                 else {
+                    cl = (int) ( Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2)) +
+                                 Math.sqrt(Math.pow(this.greyScale[y-1][x] - greyScale[y][x-1], 2)) );
 
+                    cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
+
+                    cr = (int) ( Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2)) +
+                                 Math.sqrt(Math.pow(this.greyScale[y][x+1] - greyScale[y-1][x], 2)) );
+
+                    costMat[y][x] += Math.min(costMat[y-1][x-1] + cl,
+                                     Math.min(costMat[y-1][x] + cv,
+                                              costMat[y-1][x+1] + cr));
                 }
             }
         }
 
+        //trace back in the cast matrix to find the minimal seam.
 
+
+        //insert the seam to the DS
 
 	}
 
