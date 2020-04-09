@@ -92,16 +92,16 @@ public class SeamsCarver extends ImageProcessor {
 	}
 
 	private double calcMagnitude(Pixel pixel) {
-		double magnitude = Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y +1] - pixel.greyColor));
+		double magnitude = Math.sqrt(Math.pow(this.greyScale[pixel.x+1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
 
 		if(pixel.x == inWidth -1) {
-			magnitude = Math.sqrt((this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor));
+			magnitude = Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
 		}
 		if(pixel.y == inHeight -1) {
-			magnitude = Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y -1] - pixel.greyColor));
+			magnitude = Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (Math.pow(this.greyScale[pixel.x][pixel.y-1] - pixel.greyColor, 2)));
 		}
 		if(pixel.y == inHeight -1 && pixel.x == inWidth -1 ) {
-			magnitude = Math.sqrt((this.greyScale[pixel.x - 1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y -1] - pixel.greyColor));
+			magnitude = Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y-1] - pixel.greyColor, 2)));
 		}
 		return magnitude;
 	}
