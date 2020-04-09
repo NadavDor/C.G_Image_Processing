@@ -91,17 +91,17 @@ public class SeamsCarver extends ImageProcessor {
 		this.seams = new boolean[inHeight][inWidth];
 	}
 
-	private double calcMagnitude(Pixel pixel) {
-		double magnitude = Math.sqrt(Math.pow(this.greyScale[pixel.x+1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
+	private int calcMagnitude(Pixel pixel) {
+		int magnitude = (int)Math.sqrt(Math.pow(this.greyScale[pixel.x+1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
 
 		if(pixel.x == inWidth -1) {
-			magnitude = Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
+			magnitude = (int)Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
 		}
 		if(pixel.y == inHeight -1) {
-			magnitude = Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (Math.pow(this.greyScale[pixel.x][pixel.y-1] - pixel.greyColor, 2)));
+			magnitude = (int)Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (Math.pow(this.greyScale[pixel.x][pixel.y-1] - pixel.greyColor, 2)));
 		}
 		if(pixel.y == inHeight -1 && pixel.x == inWidth -1 ) {
-			magnitude = Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y-1] - pixel.greyColor, 2)));
+			magnitude = (int)Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y-1] - pixel.greyColor, 2)));
 		}
 		return magnitude;
 	}
@@ -118,11 +118,11 @@ public class SeamsCarver extends ImageProcessor {
 	 */
 	private void findMinimalSeam(int seamNum) {
 
-		double [][] costMat = new double[inHeight][inWidth - seamNum];
+		long [][] costMat = new long[inHeight][inWidth - seamNum];
 
 		// fill the first row
 		for (int x = 0; x < costMat[0].length; x++) {
-			costMat[0][x] = edges[0].get(x).magnitude;
+			costMat[0][x] = (long) edges[0].get(x).magnitude;
 		}
 
 	}
@@ -164,7 +164,7 @@ public class SeamsCarver extends ImageProcessor {
         int x;
         int y;
         int greyColor;
-        double magnitude;
+        int magnitude;
 
         public Pixel (int x, int y, int greyColor){
             this.x = x;
