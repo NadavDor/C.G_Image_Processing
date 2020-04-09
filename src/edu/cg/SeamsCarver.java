@@ -17,6 +17,7 @@ public class SeamsCarver extends ImageProcessor {
 	private ResizeOperation resizeOp;
 	boolean[][] imageMask;
 	ArrayList<Pixel>[] edges;
+	int[][] greyScale;
 	boolean[][] seams;
 
 	// TODO: Add some additional fields
@@ -41,25 +42,54 @@ public class SeamsCarver extends ImageProcessor {
 		else
 			resizeOp = this::duplicateWorkingImage;
 
-		// TODO: You may initialize your additional fields and apply some preliminary
-		// calculations.
-
+		if(numOfSeams > 0) {
+			initGreyscaleMatrix();
         /* init a matrix (might need to make it as a dynamic matrix) to represent the gradient magnitude
 		 aka the "edges" of the image.
 		 remember: work on the grayscale image and use forward differencing
 		*/
-       initEdgesMatrix();
+			initEdgesMatrix();
 
-       // init some data structure to store all the k seams.
-       initSeamsMatrix();
+			// init some data structure to store all the k seams.
+			initSeamsMatrix();
 
-       // find the 𝑘 most minimal seams
-		findKSeams();
-
-
+			// find the 𝑘 most minimal seams
+			findKSeams();
+		}
 
 
 		this.logger.log("preliminary calculations were ended.");
+	}
+
+	private void initGreyscaleMatrix() {
+		// get the grayscale image
+		BufferedImage greyImg = this.greyscale();
+		this.greyScale = new int[inHeight][inWidth];
+
+		forEach((y, x) -> {
+			Color c = new Color(greyImg.getRGB(x, y));
+			this.greyScale[y][x] = c.getRed();
+		});
+	}
+
+	private void initEdgesMatrix() {
+		edges = new ArrayList[inHeight];
+
+		// create the initial Edges matrix
+		for (int y = 0; y < inHeight; y++) {
+			edges[y] = new ArrayList<>();
+
+			for (int x = 0; x < inWidth; x++) {
+				Pixel pixel = new Pixel(x, y, greyScale[y][x]);
+				pixel.magnitude = calcMagnitude(pixel);
+				edges[y].add(pixel);
+			}
+		}
+	}
+
+	private int calcMagnitude(Pixel pixel) {
+		//TODO:
+		throw new UnimplementedMethodException("calcMagnitude");
 	}
 
 	private void findKSeams() {
@@ -71,23 +101,9 @@ public class SeamsCarver extends ImageProcessor {
 	private void initSeamsMatrix() {
 	}
 
-	private void initEdgesMatrix() {
-
-        // get the grayscale image
-        BufferedImage greyImg = this.greyscale();
-
-        // create the initial Edges matrix
-        forEach((y, x) -> {
-            Color c = new Color(workingImage.getRGB(x, y));
-            int grayVal = c.getRed();
 
 
-
-        });
-
-    }
-
-    public BufferedImage resize() {
+	public BufferedImage resize() {
 		return resizeOp.resize();
 	}
 
@@ -128,11 +144,13 @@ public class SeamsCarver extends ImageProcessor {
     class Pixel {
         int x;
         int y;
+        int greyColor;
         int magnitude;
 
-        public Pixel (int x, int y){
+        public Pixel (int x, int y, int greyColor){
             this.x = x;
             this.y = y;
+            this.greyColor = greyColor;
         }
     }
 }
