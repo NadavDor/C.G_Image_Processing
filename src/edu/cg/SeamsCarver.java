@@ -110,7 +110,12 @@ public class SeamsCarver extends ImageProcessor {
 	private void findKSeams() {
 		for (int i = 0; i < numOfSeams ; i++) {
 			findMinimalSeam(i);
+			updateEdgeMatrix();
 		}
+	}
+
+	private void updateEdgeMatrix() {
+
 	}
 
 	/*find a minimal seam using the edges matrix
@@ -124,15 +129,21 @@ public class SeamsCarver extends ImageProcessor {
 		//fill the matrix
         for (int y = 0; y < costMat.length ; y++) {
             for (int x = 0; x < costMat[0].length; x++) {
+
                 // fill the first row
                 if (y == 0) {
                     costMat[y][x] = edges[y].get(x).getPixelEnergy();
                 }
 
+				int cl = 0;
+				int cv = 0;
+				int cr = 0;
+
                 //left most pixel in the row
                 if (x == 0){
+					//magnitude = (int)Math.sqrt(Math.pow(this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor, 2) + (Math.pow(this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor, 2)));
 
-                }
+				}
                 // right most pixel in the row
                 else if (x == costMat[0].length - 1){
 
