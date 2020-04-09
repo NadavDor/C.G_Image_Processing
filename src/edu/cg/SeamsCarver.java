@@ -1,6 +1,8 @@
 package edu.cg;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class SeamsCarver extends ImageProcessor {
 
@@ -14,6 +16,7 @@ public class SeamsCarver extends ImageProcessor {
 	private int numOfSeams;
 	private ResizeOperation resizeOp;
 	boolean[][] imageMask;
+
 	// TODO: Add some additional fields
 
 	public SeamsCarver(Logger logger, BufferedImage workingImage, int outWidth, RGBWeights rgbWeights,
@@ -39,10 +42,26 @@ public class SeamsCarver extends ImageProcessor {
 		// TODO: You may initialize your additional fields and apply some preliminary
 		// calculations.
 
+        // get the grayscale image
+        BufferedImage greyImg = this.greyscale();
+
+        // create the initial Edges matrix
+        forEach((y, x) -> {
+            Color c = new Color(workingImage.getRGB(x, y));
+            int grayVal = c.getRed();
+
+
+
+        });
+
 		/* init a matrix (might need to make it as a dynamic matrix) to represent the gradient magnitude
 		 aka the "edges" of the image.
 		 remember: work on the grayscale image and use forward differencing
 		*/
+
+
+
+        ArrayList<ArrayList<Pixel>> edges = new ArrayList<>();
 
 		// init some data structure to store all the k seams.
 
@@ -92,4 +111,15 @@ public class SeamsCarver extends ImageProcessor {
 		// need to also remove (replicate) the matching entries from the mask as well.
 		throw new UnimplementedMethodException("getMaskAfterSeamCarving");
 	}
+
+    class Pixel {
+        int x;
+        int y;
+        int magnitude;
+
+        public Pixel (int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+    }
 }
