@@ -16,6 +16,8 @@ public class SeamsCarver extends ImageProcessor {
 	private int numOfSeams;
 	private ResizeOperation resizeOp;
 	boolean[][] imageMask;
+	ArrayList<Pixel>[] edges;
+	boolean[][] seams;
 
 	// TODO: Add some additional fields
 
@@ -42,6 +44,35 @@ public class SeamsCarver extends ImageProcessor {
 		// TODO: You may initialize your additional fields and apply some preliminary
 		// calculations.
 
+        /* init a matrix (might need to make it as a dynamic matrix) to represent the gradient magnitude
+		 aka the "edges" of the image.
+		 remember: work on the grayscale image and use forward differencing
+		*/
+       initEdgesMatrix();
+
+       // init some data structure to store all the k seams.
+       initSeamsMatrix();
+
+       // find the 𝑘 most minimal seams
+		findKSeams();
+
+
+
+
+		this.logger.log("preliminary calculations were ended.");
+	}
+
+	private void findKSeams() {
+		for (int i = 0; i < numOfSeams ; i++) {
+			findMinimalSeam();
+		}
+	}
+
+	private void initSeamsMatrix() {
+	}
+
+	private void initEdgesMatrix() {
+
         // get the grayscale image
         BufferedImage greyImg = this.greyscale();
 
@@ -54,27 +85,9 @@ public class SeamsCarver extends ImageProcessor {
 
         });
 
-		/* init a matrix (might need to make it as a dynamic matrix) to represent the gradient magnitude
-		 aka the "edges" of the image.
-		 remember: work on the grayscale image and use forward differencing
-		*/
+    }
 
-
-
-        ArrayList<ArrayList<Pixel>> edges = new ArrayList<>();
-
-		// init some data structure to store all the k seams.
-
-		// find the 𝑘 most minimal seams
-		for (int i = 0; i < numOfSeams ; i++) {
-			findMinimalSeam();
-		}
-
-
-		this.logger.log("preliminary calculations were ended.");
-	}
-
-	public BufferedImage resize() {
+    public BufferedImage resize() {
 		return resizeOp.resize();
 	}
 
