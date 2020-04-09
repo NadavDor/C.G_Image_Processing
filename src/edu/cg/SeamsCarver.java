@@ -91,9 +91,19 @@ public class SeamsCarver extends ImageProcessor {
 		this.seams = new boolean[inHeight][inWidth];
 	}
 
-	private int calcMagnitude(Pixel pixel) {
-		//TODO:
-		throw new UnimplementedMethodException("calcMagnitude");
+	private double calcMagnitude(Pixel pixel) {
+		double magnitude = Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y +1] - pixel.greyColor));
+
+		if(pixel.x == inWidth -1) {
+			magnitude = Math.sqrt((this.greyScale[pixel.x-1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y+1] - pixel.greyColor));
+		}
+		if(pixel.y == inHeight -1) {
+			magnitude = Math.sqrt((this.greyScale[pixel.x + 1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y -1] - pixel.greyColor));
+		}
+		if(pixel.y == inHeight -1 && pixel.x == inWidth -1 ) {
+			magnitude = Math.sqrt((this.greyScale[pixel.x - 1][pixel.y] - pixel.greyColor) + (this.greyScale[pixel.x][pixel.y -1] - pixel.greyColor));
+		}
+		return magnitude;
 	}
 
 	private void findKSeams() {
@@ -108,7 +118,7 @@ public class SeamsCarver extends ImageProcessor {
 	 */
 	private void findMinimalSeam(int seamNum) {
 
-		long [][] costMat = new long[inHeight][inWidth - seamNum];
+		double [][] costMat = new double[inHeight][inWidth - seamNum];
 
 		// fill the first row
 		for (int x = 0; x < costMat[0].length; x++) {
@@ -154,7 +164,7 @@ public class SeamsCarver extends ImageProcessor {
         int x;
         int y;
         int greyColor;
-        int magnitude;
+        double magnitude;
 
         public Pixel (int x, int y, int greyColor){
             this.x = x;
