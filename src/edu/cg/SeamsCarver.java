@@ -120,10 +120,29 @@ public class SeamsCarver extends ImageProcessor {
 
 		long [][] costMat = new long[inHeight][inWidth - seamNum];
 
-		// fill the first row
-		for (int x = 0; x < costMat[0].length; x++) {
-			costMat[0][x] = (long) edges[0].get(x).magnitude;
-		}
+		//fill the matrix
+        for (int y = 0; y < costMat.length ; y++) {
+            for (int x = 0; x < costMat[0].length; x++) {
+                // fill the first row
+                if (y == 0) {
+                    costMat[y][x] = edges[y].get(x).getPixelEnergy();
+                }
+
+                //left most pixel in the row
+                if (x == 0){
+
+                }
+                // right most pixel in the row
+                else if (x == costMat[0].length - 1){
+
+                }
+                else {
+
+                }
+            }
+        }
+
+
 
 	}
 
@@ -174,9 +193,10 @@ public class SeamsCarver extends ImageProcessor {
 
 		/**
 		 * get the pixels energy considering his magnitude and mask value.
+         * NOTE: we assume that imageMask his a global variable in the scope.
 		 */
 		public long getPixelEnergy(){
-			return 0;
+			return imageMask[this.y][this.x] ? (long) this.magnitude + (long) Integer.MIN_VALUE : this.magnitude ;
 		}
     }
 }
