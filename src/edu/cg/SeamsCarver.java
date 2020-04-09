@@ -87,6 +87,10 @@ public class SeamsCarver extends ImageProcessor {
 		}
 	}
 
+	private void initSeamsMatrix() {
+		this.seams = new boolean[inHeight][inWidth];
+	}
+
 	private int calcMagnitude(Pixel pixel) {
 		//TODO:
 		throw new UnimplementedMethodException("calcMagnitude");
@@ -94,22 +98,27 @@ public class SeamsCarver extends ImageProcessor {
 
 	private void findKSeams() {
 		for (int i = 0; i < numOfSeams ; i++) {
-			findMinimalSeam();
+			findMinimalSeam(i);
 		}
 	}
 
-	private void initSeamsMatrix() {
+	/*find a minimal seam using the edges matrix
+	 and store it in the DS.
+	 input: the current seam number.
+	 */
+	private void findMinimalSeam(int seamNum) {
+
+		long [][] costMat = new long[inHeight][inWidth - seamNum];
+
+		// fill the first row
+		for (int x = 0; x < costMat[0].length; x++) {
+			costMat[0][x] = edges[0].get(x).magnitude;
+		}
+
 	}
-
-
 
 	public BufferedImage resize() {
 		return resizeOp.resize();
-	}
-
-	/*find a minimal seam using the edges matrix
-	 and store it in the DS */
-	private void findMinimalSeam() {
 	}
 
 	// delete all the seams found in the DS from the original image.
@@ -152,5 +161,12 @@ public class SeamsCarver extends ImageProcessor {
             this.y = y;
             this.greyColor = greyColor;
         }
+
+		/**
+		 * get the pixels energy considering his magnitude and mask value.
+		 */
+		public long getPixelEnergy(){
+			return 0;
+		}
     }
 }
