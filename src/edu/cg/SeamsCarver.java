@@ -133,6 +133,16 @@ public class SeamsCarver extends ImageProcessor {
 	}
 
 	private void updateEdgeMatrix() {
+		//remove seam from edges matrix
+		for (int i = 0; i < lastSeam.length; i++) {
+			this.edges[i].remove(lastSeam[i]);
+		}
+		//calc new magnitude for the new edges matrix
+		for (int y = 0; y < edges.length; y++) {
+			for (int x = 0; x < edges[y].size(); x++) {
+				this.edges[y].get(x).magnitude = calcMagnitude(this.edges[y].get(x));
+			}
+		}
 
 	}
 
