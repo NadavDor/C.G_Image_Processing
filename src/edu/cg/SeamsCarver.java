@@ -92,19 +92,7 @@ public class SeamsCarver extends ImageProcessor {
 			}
 		}
 	}
-	private void updateEdgeMatrix() {
-		//remove seam from edges matrix
-		for (int i = 0; i < lastSeam.length; i++) {
-			this.edges[i].remove(lastSeam[i]);
-		}
-		//calc new magnitude for the new edges matrix
-		for (int y = 0; y < edges.length; y++) {
-			for (int x = 0; x < edges[y].size(); x++) {
-				this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x));
-			}
-		}
-
-	private void initSeamsVars() {
+	private void initSeamsVars(){
 		this.seamsMatrix = new boolean[inHeight][inWidth];
 		this.lastSeam = new int[inHeight];
 	}
@@ -151,9 +139,6 @@ public class SeamsCarver extends ImageProcessor {
 		return magnitude;
 	}
 
-
-
-
 	private void findKSeams() {
 		for (int i = 0; i < numOfSeams ; i++) {
 			findMinimalSeam(i);
@@ -172,7 +157,7 @@ public class SeamsCarver extends ImageProcessor {
 		//calc new magnitude for the new edges matrix
 		for (int y = 0; y < edges.length; y++) {
 			for (int x = 0; x < edges[y].size(); x++) {
-				this.edges[y].get(x).magnitude = calcMagnitude(this.edges[y].get(x));
+				this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x));
 			}
 		}
 
@@ -182,7 +167,7 @@ public class SeamsCarver extends ImageProcessor {
 	 and store it in the DS.
 	 input: the current seam number.
 	 */
-	private void findMinimalSeam(int seamNum) {
+	private void findMinimalSeam(int seamNum){
 
 		long [][] costMat = new long[inHeight][inWidth - seamNum];
 
@@ -300,7 +285,7 @@ public class SeamsCarver extends ImageProcessor {
         int greyColor;
         int magnitude;
 
-        public Pixel (int x, int y, int greyColor){
+        public Pixel(int x, int y, int greyColor){
             this.x = x;
             this.y = y;
             this.greyColor = greyColor;
@@ -315,3 +300,4 @@ public class SeamsCarver extends ImageProcessor {
 		}
     }
 }
+
