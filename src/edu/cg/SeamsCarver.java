@@ -99,31 +99,22 @@ public class SeamsCarver extends ImageProcessor {
 	}
 
 	private int calcMagnitude(Pixel pixel) {
-		int magnitude, xMinus1, yMinus1, xPlus1, yPlus1;
-		if (pixel.y == inHeight - 1 && pixel.x == inWidth - 1) {
-			xMinus1 = edges[pixel.y].get(pixel.x - 1).x;
-			yMinus1 = edges[pixel.y - 1].get(pixel.x).y;
-			magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xMinus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yMinus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
-		} else {
+		int magnitude;
+		if(pixel.y == inHeight -1 && pixel.x == inWidth -1 ) {
+			magnitude = (int)Math.sqrt(Math.pow(this.greyScale[pixel.y][pixel.x-1]- this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[pixel.y-1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
+		}
+		else {
 			if (pixel.x == inWidth - 1) {
 				magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][pixel.x - 1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[pixel.y + 1][pixel.x - 1] - this.greyScale[pixel.y][pixel.x], 2)));
-				xMinus1 = edges[pixel.y].get(pixel.x - 1).x;
-				yPlus1 = edges[pixel.y + 1].get(pixel.x).y;
-				magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xMinus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yPlus1][xMinus1] - this.greyScale[pixel.y][pixel.x], 2)));
 			} else {
 				if (pixel.y == inHeight - 1) {
 					magnitude = (int) Math.sqrt((this.greyScale[pixel.y][pixel.x + 1] - this.greyScale[pixel.y][pixel.x]) + (Math.pow(this.greyScale[pixel.y - 1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
-					xPlus1 = edges[pixel.y].get(pixel.x + 1).x;
-					yMinus1 = edges[pixel.y - 1].get(pixel.x).y;
-					magnitude = (int) Math.sqrt((this.greyScale[pixel.y][xPlus1] - this.greyScale[pixel.y][pixel.x]) + (Math.pow(this.greyScale[yMinus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 				} else {
 					magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][pixel.x + 1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[pixel.y + 1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
-					xPlus1 = edges[pixel.y].get(pixel.x + 1).x;
-					yPlus1 = edges[pixel.y + 1].get(pixel.x).y;
-					magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xPlus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yPlus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 				}
 			}
 		}
+		return magnitude;
 	}
 
 
