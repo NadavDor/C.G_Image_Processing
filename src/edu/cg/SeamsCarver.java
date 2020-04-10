@@ -19,7 +19,9 @@ public class SeamsCarver extends ImageProcessor {
 	ArrayList<Pixel>[] edges;
 	int[][] greyScale;
 	boolean[][] seamsMatrix;
-	// seams;
+
+	// the last seam that was found
+	int[] lastSeam;
 
 	// TODO: Add some additional fields
 
@@ -52,7 +54,7 @@ public class SeamsCarver extends ImageProcessor {
 			initEdgesMatrix();
 
 			// init some data structure to store all the k seams.
-			initSeamsMatrix();
+			initSeamsVars();
 
 			// find the 𝑘 most minimal seams
 			findKSeams();
@@ -88,8 +90,9 @@ public class SeamsCarver extends ImageProcessor {
 		}
 	}
 
-	private void initSeamsMatrix() {
+	private void initSeamsVars() {
 		this.seamsMatrix = new boolean[inHeight][inWidth];
+		this.lastSeam = new int[inHeight];
 	}
 
 	private int calcMagnitude(Pixel pixel) {
@@ -151,8 +154,7 @@ public class SeamsCarver extends ImageProcessor {
                     // find how to calc cv here
                     //cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
-                    cr = (int) ( Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2)) +
-                                 Math.sqrt(Math.pow(this.greyScale[y][x+1] - greyScale[y-1][x], 2)) );
+                    cr = (int) Math.sqrt(Math.pow(this.greyScale[y][x+1] - greyScale[y-1][x], 2));
 
                     costMat[y][x] += Math.min( costMat[y-1][x], costMat[y-1][x+1] + cr);
 				}
@@ -161,8 +163,7 @@ public class SeamsCarver extends ImageProcessor {
                     // find how to calc cv here
                     //cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
-                    cl = (int) ( Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2)) +
-                            Math.sqrt(Math.pow(this.greyScale[y-1][x] - greyScale[y][x-1], 2)) );
+                    cl = (int)  Math.sqrt(Math.pow(this.greyScale[y-1][x] - greyScale[y][x-1], 2));
 
                     costMat[y][x] += Math.min( costMat[y-1][x], costMat[y-1][x-1] + cl);
                 }
