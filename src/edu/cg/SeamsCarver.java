@@ -51,8 +51,11 @@ public class SeamsCarver extends ImageProcessor {
 		 aka the "edges" of the image.
 		 remember: work on the grayscale image and use forward differencing
 		*/
+        try {
 			initEdgesMatrix();
-
+		} catch (Exception e){
+			System.out.println("exeption here!");
+		}
 			// init some data structure to store all the k seams.
 			initSeamsVars();
 
@@ -137,6 +140,9 @@ public class SeamsCarver extends ImageProcessor {
 		for (int i = 0; i < lastSeam.length; i++) {
 			this.edges[i].remove(lastSeam[i]);
 		}
+
+		//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
+
 		//calc new magnitude for the new edges matrix
 		for (int y = 0; y < edges.length; y++) {
 			for (int x = 0; x < edges[y].size(); x++) {
@@ -163,9 +169,9 @@ public class SeamsCarver extends ImageProcessor {
                 // fill the first row without considering cl, cv of cr.
                 if (y == 0) continue;
 
-				int cl = 0;
-				int cv = 0;
-				int cr = 0;
+				int cl;
+				int cv;
+				int cr;
 
                 //left most pixel in the row
                 if (x == 0){
