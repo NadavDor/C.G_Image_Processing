@@ -120,25 +120,25 @@ public class SeamsCarver extends ImageProcessor {
 	}
 
 
-		private int updateMagnitude (Pixel pixel){
+		private int updateMagnitude (Pixel pixel, int eX,int eY){
 			int magnitude, xMinus1, yMinus1, xPlus1, yPlus1;
-			if (pixel.y == this.edges.length - 1 && pixel.x ==this.edges[0].size() - 1) {
-				xMinus1 = edges[pixel.y].get(pixel.x - 1).x;
-				yMinus1 = edges[pixel.y - 1].get(pixel.x).y;
+			if (eY == this.edges.length - 1 && eX ==this.edges[0].size() - 1) {
+				xMinus1 = edges[eY].get(eX - 1).x;
+				yMinus1 = edges[eY - 1].get(eX).y;
 				magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xMinus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yMinus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 			} else {
-				if (pixel.x == this.edges[0].size() - 1) {
-					xMinus1 = edges[pixel.y].get(pixel.x - 1).x;
-					yPlus1 = edges[pixel.y + 1].get(pixel.x).y;
+				if (eX == this.edges[0].size() - 1) {
+					xMinus1 = edges[eY].get(eX - 1).x;
+					yPlus1 = edges[eY + 1].get(eX).y;
 					magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xMinus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yPlus1][xMinus1] - this.greyScale[pixel.y][pixel.x], 2)));
 				} else {
-					if (pixel.y == this.edges.length - 1) {
-						xPlus1 = edges[pixel.y].get(pixel.x + 1).x;
-						yMinus1 = edges[pixel.y - 1].get(pixel.x).y;
+					if (eY == this.edges.length - 1) {
+						xPlus1 = edges[eY].get(eX + 1).x;
+						yMinus1 = edges[eY - 1].get(eX).y;
 						magnitude = (int) Math.sqrt((this.greyScale[pixel.y][xPlus1] - this.greyScale[pixel.y][pixel.x]) + (Math.pow(this.greyScale[yMinus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 					} else {
-						xPlus1 = edges[pixel.y].get(pixel.x + 1).x;
-						yPlus1 = edges[pixel.y + 1].get(pixel.x).y;
+						xPlus1 = edges[eY].get(eX + 1).x;
+						yPlus1 = edges[eY + 1].get(eX).y;
 						magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xPlus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yPlus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 					}
 				}
@@ -167,7 +167,7 @@ public class SeamsCarver extends ImageProcessor {
 			//calc new magnitude for the new edges matrix
 			for (int y = 0; y < edges.length; y++) {
 				for (int x = 0; x < edges[y].size(); x++) {
-					this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x));
+					this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x),x,y);
 				}
 			}
 			this.logger.log("Finished updating Edges Matrix");
