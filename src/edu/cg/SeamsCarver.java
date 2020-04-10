@@ -18,7 +18,8 @@ public class SeamsCarver extends ImageProcessor {
 	boolean[][] imageMask;
 	ArrayList<Pixel>[] edges;
 	int[][] greyScale;
-	boolean[][] seams;
+	boolean[][] seamsMatrix;
+	// seams;
 
 	// TODO: Add some additional fields
 
@@ -88,7 +89,7 @@ public class SeamsCarver extends ImageProcessor {
 	}
 
 	private void initSeamsMatrix() {
-		this.seams = new boolean[inHeight][inWidth];
+		this.seamsMatrix = new boolean[inHeight][inWidth];
 	}
 
 	private int calcMagnitude(Pixel pixel) {
@@ -176,7 +177,8 @@ public class SeamsCarver extends ImageProcessor {
             }
         }
 
-        //trace back in the cast matrix to find the minimal seam.
+        //trace back in the cost matrix to find the minimal seam:
+
 
 
         //insert the seam to the DS
