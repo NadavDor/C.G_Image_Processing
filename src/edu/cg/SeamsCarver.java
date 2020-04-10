@@ -161,9 +161,9 @@ public class SeamsCarver extends ImageProcessor {
 			//remove seam from edges matrix
 			for (int i = 0; i < lastSeam.length; i++) {
 				this.edges[i].remove(lastSeam[i]);
+				this.edges[i].subList(this.edges[i].size()-1, this.edges[i].size()).clear();
 			}
 			//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
-
 			//calc new magnitude for the new edges matrix
 			for (int y = 0; y < edges.length; y++) {
 				for (int x = 0; x < edges[y].size(); x++) {
