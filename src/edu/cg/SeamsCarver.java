@@ -202,11 +202,31 @@ public class SeamsCarver extends ImageProcessor {
         }
 
         //trace back in the cost matrix to find the minimal seam:
+		int xIndex = 0;
+        long minValue = Long.MAX_VALUE;
+		for (int x = 0; x < costMat[0].length ; x++) {
+			if (costMat[costMat.length][x] < minValue) xIndex = x;
+		}
+		this.lastSeam[lastSeam.length-1] = xIndex;
 
+		int nextXIndex;
+		for (int y = costMat.length-1 ; y > 0 ; y--) {
+			//left most pixel in the row
+			if (xIndex == 0){
+				nextXIndex = costMat[y-1][xIndex] < costMat[y-1][xIndex+1] ? xIndex : xIndex+1;
+			}
+			// right most pixel in the row
+			else if (xIndex == costMat[0].length - 1){
+				nextXIndex = costMat[y-1][xIndex] < costMat[y-1][xIndex-1] ? xIndex : xIndex-1;
+			}
+			else {
+				nextXIndex = costMat[y-1][xIndex] < costMat[y-1][xIndex+1] ? xIndex : xIndex+1;
+				nextXIndex = costMat[y-1][nextXIndex] < costMat[y-1][xIndex-1] ? nextXIndex : xIndex-1;
+			}
 
-
-        //insert the seam to the DS
-
+			this.lastSeam[y-1] = nextXIndex;
+			xIndex = nextXIndex;
+		}
 	}
 
 	public BufferedImage resize() {
