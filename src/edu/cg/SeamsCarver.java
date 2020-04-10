@@ -23,8 +23,6 @@ public class SeamsCarver extends ImageProcessor {
 	// the last seam that was found
 	int[] lastSeam;
 
-	// TODO: Add some additional fields
-
 	public SeamsCarver(Logger logger, BufferedImage workingImage, int outWidth, RGBWeights rgbWeights,
 					   boolean[][] imageMask) {
 		super((s) -> logger.log("Seam carving: " + s), workingImage, rgbWeights, outWidth, workingImage.getHeight());
@@ -150,7 +148,11 @@ public class SeamsCarver extends ImageProcessor {
 			this.logger.log("Finding" + this.numOfSeams + "seams");
 			for (int i = 0; i < numOfSeams; i++) {
 				findMinimalSeam(i);
-				updateEdgeMatrix();
+				try {
+                    updateEdgeMatrix();
+                }catch(Exception e){
+                    System.out.println("exception here2");
+                }
 			}
 			this.logger.log("Founded" + this.numOfSeams + "seams!");
 		}
@@ -183,10 +185,11 @@ public class SeamsCarver extends ImageProcessor {
 		private void findMinimalSeam ( int seamNum){
 
 			long[][] costMat = new long[inHeight][inWidth - seamNum];
+
 			//fill the matrix
 			for (int y = 0; y < costMat.length; y++) {
 				for (int x = 0; x < costMat[0].length; x++) {
-					this.logger.log("working on" +y +"," +x);
+				//	this.logger.log("working on" +y +"," +x);
 					costMat[y][x] = edges[y].get(x).getPixelEnergy();
 
 					// fill the first row without considering cl, cv of cr.
@@ -234,7 +237,7 @@ public class SeamsCarver extends ImageProcessor {
 		int xIndex = 0;
         long minValue = Long.MAX_VALUE;
 		for (int x = 0; x < costMat[0].length ; x++) {
-			if (costMat[costMat.length][x] < minValue) xIndex = x;
+			if (costMat[costMat.length-1][x] < minValue) xIndex = x;
 		}
 		this.lastSeam[lastSeam.length-1] = xIndex;
 		this.seamsMatrix[lastSeam.length-1][xIndex] = true;
