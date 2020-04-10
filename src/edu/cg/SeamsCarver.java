@@ -79,6 +79,7 @@ public class SeamsCarver extends ImageProcessor {
 	}
 
 	private void initEdgesMatrix() {
+		this.logger.log("initializing Edges Matrix");
 		edges = new ArrayList[inHeight];
 
 		// create the initial Edges matrix
@@ -91,6 +92,7 @@ public class SeamsCarver extends ImageProcessor {
 				edges[y].add(pixel);
 			}
 		}
+		this.logger.log("Finished initializind Edges Matrix");
 	}
 
 	private void initSeamsVars() {
@@ -145,14 +147,17 @@ public class SeamsCarver extends ImageProcessor {
 		}
 
 		private void findKSeams () {
+			this.logger.log("Finding" + this.numOfSeams + "seams");
 			for (int i = 0; i < numOfSeams; i++) {
 				findMinimalSeam(i);
 				updateEdgeMatrix();
 			}
+			this.logger.log("Founded" + this.numOfSeams + "seams!");
 		}
 
 
 		private void updateEdgeMatrix () {
+			this.logger.log("updating Edges Matrix");
 			//remove seam from edges matrix
 			for (int i = 0; i < lastSeam.length; i++) {
 				this.edges[i].remove(lastSeam[i]);
@@ -165,7 +170,7 @@ public class SeamsCarver extends ImageProcessor {
 					this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x));
 				}
 			}
-
+			this.logger.log("Finished updating Edges Matrix");
 		}
 
 
