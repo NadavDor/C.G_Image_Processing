@@ -163,7 +163,7 @@ public class SeamsCarver extends ImageProcessor {
 			//remove seam from edges matrix
 			for (int i = 0; i < lastSeam.length; i++) {
 				this.edges[i].remove(lastSeam[i]);
-				this.edges[i].subList(this.edges[i].size()-1, this.edges[i].size()).clear();
+				this.edges[i].subList(this.edges[i].size(), this.edges[i].size()).clear();
 			}
 			//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
 			//calc new magnitude for the new edges matrix
@@ -269,7 +269,23 @@ public class SeamsCarver extends ImageProcessor {
 		// delete all the seams found in the DS from the original image.
 		private BufferedImage reduceImageWidth () {
 			// TODO: Implement this method, remove the exception.
-			throw new UnimplementedMethodException("reduceImageWidth");
+			logger.log("Preparing for reducingImageWidth");
+			BufferedImage ans = newEmptyInputSizedImage();
+
+			forEach((y, x) -> {
+
+				if (seamsMatrix[y][x]){
+					Color c = new Color(255, 0, 0);
+					ans.setRGB(x, y, c.getRGB());
+				} else {
+					Color c = new Color(workingImage.getRGB(x, y));
+					ans.setRGB(x, y, c.getRGB());
+				}
+			});
+
+			logger.log("reducingImageWidth done!");
+			return ans;
+			//throw new UnimplementedMethodException("reduceImageWidth");
 		}
 
 		// duplicate each of the seams found in the DS from the original image.
@@ -292,7 +308,13 @@ public class SeamsCarver extends ImageProcessor {
 			// corresponding pixels.
 			// HINT: Once you remove (replicate) the chosen seams from the input image, you
 			// need to also remove (replicate) the matching entries from the mask as well.
-			throw new UnimplementedMethodException("getMaskAfterSeamCarving");
+
+			forEach((y, x) -> {
+				if (seamsMatrix[y][x]) imageMask[y][x] = false;
+			});
+
+			return imageMask;
+			//throw new UnimplementedMethodException("getMaskAfterSeamCarving");
 		}
 
 		class Pixel {
