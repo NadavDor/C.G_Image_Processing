@@ -152,6 +152,8 @@ public class SeamsCarver extends ImageProcessor {
 		for (int i = 0; i < lastSeam.length; i++) {
 			this.edges[i].remove(lastSeam[i]);
 		}
+		//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
+
 		//calc new magnitude for the new edges matrix
 		for (int y = 0; y < edges.length; y++) {
 			for (int x = 0; x < edges[y].size(); x++) {
@@ -160,16 +162,9 @@ public class SeamsCarver extends ImageProcessor {
 		}
 
 	}
-		//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
 
-		//calc new magnitude for the new edges matrix
-		for (int y = 0; y < edges.length; y++) {
-			for (int x = 0; x < edges[y].size(); x++) {
-				this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x));
-			}
-		}
 
-	}
+
 
 	/*find a minimal seam using the edges matrix
 	 and store it in the DS.
