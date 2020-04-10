@@ -124,6 +124,7 @@ public class SeamsCarver extends ImageProcessor {
 				}
 			}
 		}
+		return magnitude;
 	}
 
 
@@ -234,13 +235,15 @@ public class SeamsCarver extends ImageProcessor {
 				}
 			}
 
-			//trace back in the cost matrix to find the minimal seam:
-			int xIndex = 0;
-			long minValue = Long.MAX_VALUE;
-			for (int x = 0; x < costMat[0].length; x++) {
-				if (costMat[costMat.length][x] < minValue) xIndex = x;
-			}
-			this.lastSeam[lastSeam.length - 1] = xIndex;
+        //trace back in the cost matrix to find the minimal seam,
+		//and update the seams variables.
+		int xIndex = 0;
+        long minValue = Long.MAX_VALUE;
+		for (int x = 0; x < costMat[0].length ; x++) {
+			if (costMat[costMat.length][x] < minValue) xIndex = x;
+		}
+		this.lastSeam[lastSeam.length-1] = xIndex;
+		this.seamsMatrix[lastSeam.length-1][xIndex] = true;
 
 			int nextXIndex;
 			for (int y = costMat.length - 1; y > 0; y--) {
@@ -256,10 +259,11 @@ public class SeamsCarver extends ImageProcessor {
 					nextXIndex = costMat[y - 1][nextXIndex] < costMat[y - 1][xIndex - 1] ? nextXIndex : xIndex - 1;
 				}
 
-				this.lastSeam[y - 1] = nextXIndex;
-				xIndex = nextXIndex;
-			}
+			this.lastSeam[y-1] = nextXIndex;
+			this.seamsMatrix[y-1][nextXIndex] = true;
+			xIndex = nextXIndex;
 		}
+	}
 
 		public BufferedImage resize () {
 			return resizeOp.resize();
