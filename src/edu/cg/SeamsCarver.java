@@ -122,17 +122,17 @@ public class SeamsCarver extends ImageProcessor {
 
 		private int updateMagnitude (Pixel pixel){
 			int magnitude, xMinus1, yMinus1, xPlus1, yPlus1;
-			if (pixel.y == inHeight - 1 && pixel.x == inWidth - 1) {
+			if (pixel.y == this.edges.length - 1 && pixel.x ==this.edges[0].size() - 1) {
 				xMinus1 = edges[pixel.y].get(pixel.x - 1).x;
 				yMinus1 = edges[pixel.y - 1].get(pixel.x).y;
 				magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xMinus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yMinus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 			} else {
-				if (pixel.x == inWidth - 1) {
+				if (pixel.x == this.edges[0].size() - 1) {
 					xMinus1 = edges[pixel.y].get(pixel.x - 1).x;
 					yPlus1 = edges[pixel.y + 1].get(pixel.x).y;
 					magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][xMinus1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[yPlus1][xMinus1] - this.greyScale[pixel.y][pixel.x], 2)));
 				} else {
-					if (pixel.y == inHeight - 1) {
+					if (pixel.y == this.edges.length - 1) {
 						xPlus1 = edges[pixel.y].get(pixel.x + 1).x;
 						yMinus1 = edges[pixel.y - 1].get(pixel.x).y;
 						magnitude = (int) Math.sqrt((this.greyScale[pixel.y][xPlus1] - this.greyScale[pixel.y][pixel.x]) + (Math.pow(this.greyScale[yMinus1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
@@ -183,11 +183,10 @@ public class SeamsCarver extends ImageProcessor {
 		private void findMinimalSeam ( int seamNum){
 
 			long[][] costMat = new long[inHeight][inWidth - seamNum];
-
 			//fill the matrix
 			for (int y = 0; y < costMat.length; y++) {
 				for (int x = 0; x < costMat[0].length; x++) {
-
+					this.logger.log("working on" +y +"," +x);
 					costMat[y][x] = edges[y].get(x).getPixelEnergy();
 
 					// fill the first row without considering cl, cv of cr.
