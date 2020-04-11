@@ -105,7 +105,7 @@ public class SeamsCarver extends ImageProcessor {
 		}
 		else {
 			if (pixel.x == inWidth - 1) {
-				magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][pixel.x - 1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[pixel.y + 1][pixel.x - 1] - this.greyScale[pixel.y][pixel.x], 2)));
+				magnitude = (int) Math.sqrt(Math.pow(this.greyScale[pixel.y][pixel.x - 1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.pow(this.greyScale[pixel.y + 1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
 			} else {
 				if (pixel.y == inHeight - 1) {
 					magnitude = (int) Math.sqrt((this.greyScale[pixel.y][pixel.x + 1] - this.greyScale[pixel.y][pixel.x]) + (Math.pow(this.greyScale[pixel.y - 1][pixel.x] - this.greyScale[pixel.y][pixel.x], 2)));
@@ -204,7 +204,7 @@ public class SeamsCarver extends ImageProcessor {
 						// find how to calc cv here
 						//cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
-						cr = (int) Math.sqrt(Math.pow(this.greyScale[y][x + 1] - greyScale[y - 1][x], 2));
+						cr = (int) Math.sqrt(Math.pow(greyScale[y][x + 1] - greyScale[y - 1][x], 2));
 
 						costMat[y][x] += Math.min(costMat[y - 1][x], costMat[y - 1][x + 1] + cr);
 					}
@@ -213,17 +213,17 @@ public class SeamsCarver extends ImageProcessor {
 						// find how to calc cv here
 						//cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
-						cl = (int) Math.sqrt(Math.pow(this.greyScale[y - 1][x] - greyScale[y][x - 1], 2));
+						cl = (int) Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y - 1][x], 2));
 
 						costMat[y][x] += Math.min(costMat[y - 1][x], costMat[y - 1][x - 1] + cl);
 					} else {
-						cl = (int) (Math.sqrt(Math.pow(this.greyScale[y][x - 1] - greyScale[y][x + 1], 2)) +
-								Math.sqrt(Math.pow(this.greyScale[y - 1][x] - greyScale[y][x - 1], 2)));
+						cl = (int) (Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y][x + 1], 2)) +
+							    	Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y - 1][x], 2)));
 
-						cv = (int) Math.sqrt(Math.pow(this.greyScale[y][x - 1] - greyScale[y][x + 1], 2));
+						cv = (int) Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y][x + 1], 2));
 
-						cr = (int) (Math.sqrt(Math.pow(this.greyScale[y][x - 1] - greyScale[y][x + 1], 2)) +
-								Math.sqrt(Math.pow(this.greyScale[y][x + 1] - greyScale[y - 1][x], 2)));
+						cr = (int) (Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y][x + 1], 2)) +
+								Math.sqrt(Math.pow(greyScale[y][x + 1] - greyScale[y - 1][x], 2)));
 
 						costMat[y][x] += Math.min(costMat[y - 1][x - 1] + cl,
 								Math.min(costMat[y - 1][x] + cv,
