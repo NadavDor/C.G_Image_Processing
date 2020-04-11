@@ -17,6 +17,7 @@ public class SeamsCarver extends ImageProcessor {
 	private ResizeOperation resizeOp;
 	boolean[][] imageMask;
 	ArrayList<Pixel>[] edges;
+	long[][] costMat;
 	int[][] greyScale;
 	boolean[][] seamsMatrix;
 
@@ -228,7 +229,7 @@ public class SeamsCarver extends ImageProcessor {
 	 */
 		private void findMinimalSeam ( int seamNum){
 
-			long[][] costMat = new long[inHeight][inWidth - seamNum];
+		    costMat = new long[inHeight][inWidth - seamNum];
 
 			//fill the matrix
 			for (int y = 0; y < costMat.length; y++) {
@@ -257,7 +258,7 @@ public class SeamsCarver extends ImageProcessor {
 						lPixel = edges[y].get(x-1);
 						tPixel = edges[y-1].get(x);
 
-						cl = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x], 2));
+						cl = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x]);
 
 						costMat[y][x] += Math.min(costMat[y - 1][x], costMat[y - 1][x - 1] + cl);
 					} else {
@@ -266,13 +267,13 @@ public class SeamsCarver extends ImageProcessor {
 						rPixel = edges[y].get(x+1);
 
 
-						cl = (int) (Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x], 2)) +
-							    	Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x], 2)));
+						cl = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]) +
+							 Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x]);
 
-						cv = (int)  Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x], 2));
+						cv = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]);
 
-						cr = (int) (Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x], 2)) +
-									Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x], 2)));
+						cr = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]) +
+							 Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x]);
 
 						costMat[y][x] += Math.min(costMat[y - 1][x - 1] + cl,
 										 Math.min(costMat[y - 1][x] + cv,
@@ -280,40 +281,83 @@ public class SeamsCarver extends ImageProcessor {
 					}
 				}
 			}
+			traceBack();
+	}
 
-        //trace back in the cost matrix to find the minimal seam,
-		//and update the seams variables.
-		int xIndex = 0;
+    //trace back in the cost matrix to find the minimal seam,
+    //and update the seams variables.
+	private void traceBack(){
+
+        int xIndex = 0;
         long minValue = Long.MAX_VALUE;
-		for (int x = 0; x < costMat[0].length ; x++) {
-			if (costMat[costMat.length-1][x] < minValue){
-			    xIndex = x;
+        for (int x = 0; x < costMat[0].length ; x++) {
+            if (costMat[costMat.length-1][x] < minValue){
+                xIndex = x;
                 minValue = costMat[costMat.length-1][x];
             }
-		}
+        }
 
-		this.lastSeam[lastSeam.length-1] = xIndex;
-		this.seamsMatrix[lastSeam.length-1][xIndex] = true;
+        this.lastSeam[lastSeam.length-1] = xIndex;
+        this.seamsMatrix[lastSeam.length-1][xIndex] = true;
 
-			int nextXIndex;
-			for (int y = costMat.length - 1; y > 0; y--) {
-				//left most pixel in the row
-				if (xIndex == 0) {
-					nextXIndex = costMat[y - 1][xIndex] < costMat[y - 1][xIndex + 1] ? xIndex : xIndex + 1;
-				}
-				// right most pixel in the row
-				else if (xIndex == costMat[0].length - 1) {
-					nextXIndex = costMat[y - 1][xIndex] < costMat[y - 1][xIndex - 1] ? xIndex : xIndex - 1;
-				} else {
-					nextXIndex = costMat[y - 1][xIndex] < costMat[y - 1][xIndex + 1] ? xIndex : xIndex + 1;
-					nextXIndex = costMat[y - 1][nextXIndex] < costMat[y - 1][xIndex - 1] ? nextXIndex : xIndex - 1;
-				}
+        int nextXIndex;
+        Pixel curPixel, lPixel, tPixel, rPixel;
+        for (int y = costMat.length - 1; y > 0; y--) {
 
-			this.lastSeam[y-1] = nextXIndex;
-			this.seamsMatrix[y-1][nextXIndex] = true;
-			xIndex = nextXIndex;
-		}
-	}
+                if (xIndex > 0 && xIndex < costMat[0].length-1){
+
+                    curPixel = edges[y].get(xIndex);
+                    lPixel = edges[y].get(xIndex-1);
+                    tPixel = edges[y-1].get(xIndex);
+                    rPixel = edges[y].get(xIndex+1);
+
+                    long cl = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]) +
+                            Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x]);
+
+                    long cv = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]);
+
+                    //check the upper-left
+                    if(costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex-1] + cl)){
+                        nextXIndex = xIndex - 1;
+                    }
+                    //check the top
+                    else if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex] + cv)){
+                        nextXIndex = xIndex;
+                    }
+                    // upper-right
+                    // NOTE: if xIndex is the right most entry it should never get here.
+                    else {
+                        nextXIndex = xIndex+1;
+                    }
+                }
+                else if (xIndex == 0) {
+                    curPixel = edges[y].get(xIndex);
+                    // check the top
+                    if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex])){
+                        nextXIndex = xIndex;
+                    }
+                    // top-right
+                    else {
+                        nextXIndex = xIndex + 1;
+                    }
+                }
+                else {
+                    curPixel = edges[y].get(xIndex);
+                    // check the top
+                    if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex])){
+                        nextXIndex = xIndex;
+                    }
+                    // top-left
+                    else {
+                        nextXIndex = xIndex - 1;
+                    }
+                }
+
+            this.lastSeam[y-1] = nextXIndex;
+            this.seamsMatrix[y-1][nextXIndex] = true;
+            xIndex = nextXIndex;
+        }
+    }
 
 		public BufferedImage resize () {
 			return resizeOp.resize();
