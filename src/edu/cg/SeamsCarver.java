@@ -193,29 +193,28 @@ public class SeamsCarver extends ImageProcessor {
 			if (eX == edges[0].size()-1 && pixel.y == edges.length-1){
 				lPixel = edges[pixel.y].get(eX - 1);
 				tPixel = edges[pixel.y-1].get(eX);
-				magnitude = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x], 2)
-										 + (Math.pow(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+				magnitude = (int)(Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x])
+										 + Math.abs(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x]));
 			}
 			// right side pixel
 			else if (eX == edges[0].size()-1){
 				lPixel = edges[pixel.y].get(eX - 1);
 				bPixel = edges[pixel.y+1].get(eX);
-				magnitude = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x], 2)
-										 + (Math.pow(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+				magnitude = (int)(Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x])
+										 + Math.abs(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x]));
 			}
 			// bottom pixel
 			else if (pixel.y == edges.length-1){
 				rPixel = edges[pixel.y].get(eX + 1);
 				tPixel = edges[pixel.y-1].get(eX);
-				magnitude = (int) Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x], 2)
-										 + (Math.pow(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+				magnitude = (int)(Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x]) + Math.abs(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x]));
 			}
 			// any other pixel
 			else {
 				rPixel = edges[pixel.y].get(eX + 1);
 				bPixel = edges[pixel.y+1].get(eX);
-				magnitude = (int) Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x], 2)
-										 + (Math.pow(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+				magnitude = (int)(Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x])
+										 + (Math.abs(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x])));
 			}
 			return magnitude;
 		}
