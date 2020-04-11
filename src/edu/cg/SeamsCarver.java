@@ -240,8 +240,7 @@ public class SeamsCarver extends ImageProcessor {
 					// fill the first row without considering cl, cv of cr.
 					if (y == 0) continue;
 
-					int cl, cv, cr;
-					Pixel curPixel = edges[y].get(x);
+					long cl, cv, cr;
 					Pixel lPixel, tPixel ,rPixel;
 
 					//left most pixel in the row
@@ -250,10 +249,7 @@ public class SeamsCarver extends ImageProcessor {
 						rPixel = edges[y].get(x+1);
 						tPixel = edges[y-1].get(x);
 
-						// find how to calc cv here
-						// cv = (int)   Math.sqrt(Math.pow(this.greyScale[tvPixel.y][tvPixel.x] - greyScale[y][x+1], 2));
-
-						cr = (int) Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x], 2));
+						cr = Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x]);
 
 						costMat[y][x] += Math.min(costMat[y - 1][x], costMat[y - 1][x + 1] + cr);
 					}
@@ -261,9 +257,6 @@ public class SeamsCarver extends ImageProcessor {
 					else if (x == costMat[0].length - 1) {
 						lPixel = edges[y].get(x-1);
 						tPixel = edges[y-1].get(x);
-
-						// find how to calc cv here
-						//cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
 						cl = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x], 2));
 
@@ -294,8 +287,12 @@ public class SeamsCarver extends ImageProcessor {
 		int xIndex = 0;
         long minValue = Long.MAX_VALUE;
 		for (int x = 0; x < costMat[0].length ; x++) {
-			if (costMat[costMat.length-1][x] < minValue) xIndex = x;
+			if (costMat[costMat.length-1][x] < minValue){
+			    xIndex = x;
+                minValue = costMat[costMat.length-1][x];
+            }
 		}
+
 		this.lastSeam[lastSeam.length-1] = xIndex;
 		this.seamsMatrix[lastSeam.length-1][xIndex] = true;
 
