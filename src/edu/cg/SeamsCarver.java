@@ -167,6 +167,13 @@ public class SeamsCarver extends ImageProcessor {
 				this.edges[i].subList(this.edges[i].size(), this.edges[i].size()).clear();
 			}
 			//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
+//			for (int y = 0; y < edges.length ; y++) {
+//				for (int x = 0; x < edges[0].size(); x++) {
+//					Pixel pixToUpdate = edges[y].get(x);
+//					pixToUpdate.magnitude = updateMagnitude2(pixToUpdate, x);
+//				}
+//			}
+
 			//calc new magnitude for the new edges matrix
 			for (int y = 0; y < lastSeam.length ; y++) {
 				int x = lastSeam[y];
@@ -235,7 +242,7 @@ public class SeamsCarver extends ImageProcessor {
 			for (int y = 0; y < costMat.length; y++) {
 				for (int x = 0; x < costMat[0].length; x++) {
 				//	this.logger.log("working on" +y +"," +x);
-					costMat[y][x] = edges[y].get(x).getPixelEnergy();
+					costMat[y][x] = edges[y].get(x).getPixelEnergy(x);
 
 					// fill the first row without considering cl, cv of cr.
 					if (y == 0) continue;
@@ -281,7 +288,11 @@ public class SeamsCarver extends ImageProcessor {
 					}
 				}
 			}
-			traceBack();
+			try {
+				traceBack();
+			}catch (Exception e){
+				System.out.println(e.getMessage());
+			}
 	}
 
     //trace back in the cost matrix to find the minimal seam,
@@ -300,7 +311,7 @@ public class SeamsCarver extends ImageProcessor {
         this.lastSeam[lastSeam.length-1] = xIndex;
         this.seamsMatrix[lastSeam.length-1][xIndex] = true;
 
-        int nextXIndex;
+        int nextXIndex = 0;
         Pixel curPixel, lPixel, tPixel, rPixel;
         for (int y = costMat.length - 1; y > 0; y--) {
 
@@ -316,41 +327,62 @@ public class SeamsCarver extends ImageProcessor {
 
                     long cv = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]);
 
-                    //check the upper-left
-                    if(costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex-1] + cl)){
+					long cr = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x]) +
+							Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x]);
+
+
+					//check the upper-left
+                    if(costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex-1] + cl)){
                         nextXIndex = xIndex - 1;
                     }
                     //check the top
-                    else if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex] + cv)){
+                    else if (costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex] + cv)){
                         nextXIndex = xIndex;
                     }
                     // upper-right
-                    // NOTE: if xIndex is the right most entry it should never get here.
-                    else {
-                        nextXIndex = xIndex+1;
+                    else if (costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex+1] + cr)){
+                        nextXIndex = xIndex + 1;
                     }
+                    else{
+						System.out.println("trace back could't find a way up");
+					}
                 }
                 else if (xIndex == 0) {
                     curPixel = edges[y].get(xIndex);
-                    // check the top
-                    if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex])){
+					tPixel = edges[y-1].get(xIndex);
+					rPixel = edges[y].get(xIndex+1);
+
+					long cr = Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x]);
+
+					// check the top
+                    if (costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex])){
                         nextXIndex = xIndex;
                     }
-                    // top-right
-                    else {
-                        nextXIndex = xIndex + 1;
-                    }
+					// upper-right
+					else if (costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex+1] + cr)){
+						nextXIndex = xIndex + 1;
+					}
+					else {
+						System.out.println("trace back could't find a way up");
+					}
                 }
                 else {
                     curPixel = edges[y].get(xIndex);
-                    // check the top
-                    if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y-1][xIndex])){
+					lPixel = edges[y].get(xIndex-1);
+					tPixel = edges[y-1].get(xIndex);
+
+					long cl = Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x]);
+
+					// check the top
+                    if (costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex])){
                         nextXIndex = xIndex;
                     }
                     // top-left
-                    else {
+                    else if (costMat[y][xIndex] == (curPixel.getPixelEnergy(xIndex) + costMat[y-1][xIndex-1] + cl)){
                         nextXIndex = xIndex - 1;
-                    }
+                    } else {
+						System.out.println("trace back could't find a way up");
+					}
                 }
 
             this.lastSeam[y-1] = nextXIndex;
@@ -430,9 +462,48 @@ public class SeamsCarver extends ImageProcessor {
 			 * get the pixels energy considering his magnitude and mask value.
 			 * NOTE: we assume that imageMask his a global variable in the scope.
 			 */
-			public long getPixelEnergy() {
+			public long getPixelEnergy(int eX) {
 				return imageMask[this.y][this.x] ? (long) this.magnitude + (long) Integer.MIN_VALUE : this.magnitude;
+				//return   E1(eX) + E2(eX) + E3();
 			}
+
+			private long E1(int eX){
+				long ans;
+				if (eX < edges[0].size()-1){
+					Pixel rPixel = edges[this.y].get(eX+1);
+					ans = Math.abs(greyScale[this.y][this.x] - greyScale[rPixel.y][rPixel.x]);
+				}
+				else {
+					Pixel lPixel = edges[this.y].get(eX-1);
+					ans = Math.abs(greyScale[this.y][this.x] - greyScale[lPixel.y][lPixel.x]);
+				}
+				return ans;
+			}
+
+			private long E2(int eX){
+				long ans;
+				if (this.y < edges.length-1){
+					Pixel bPixel = edges[this.y+1].get(eX);
+					ans = Math.abs(greyScale[this.y][this.x] - greyScale[bPixel.y][bPixel.x]);
+				}
+				else {
+					Pixel tPixel = edges[this.y-1].get(eX);
+					ans = Math.abs(greyScale[this.y][this.x] - greyScale[tPixel.y][tPixel.x]);
+				}
+				return ans;
+			}
+
+			private long E3(){
+				long ans;
+				if (imageMask[this.y][this.x]){
+					ans = Integer.MIN_VALUE;
+				}
+				else {
+					ans = 0;
+				}
+				return ans;
+			}
+
 		}
 	}
 
