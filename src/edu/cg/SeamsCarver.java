@@ -167,12 +167,57 @@ public class SeamsCarver extends ImageProcessor {
 			}
 			//TODO: perform the calculation ONLY to the pixels located besides the removed seam.
 			//calc new magnitude for the new edges matrix
-			for (int y = 0; y < edges.length; y++) {
-				for (int x = 0; x < edges[y].size(); x++) {
-					this.edges[y].get(x).magnitude = updateMagnitude(this.edges[y].get(x),x,y);
+			for (int y = 0; y < lastSeam.length ; y++) {
+				int x = lastSeam[y];
+
+				Pixel pixToUpdate;
+				// the pixel on the left side of the seam.
+				if(x > 0){
+					pixToUpdate = edges[y].get(x-1);
+					pixToUpdate.magnitude = updateMagnitude2(pixToUpdate, x-1);
+				}
+				// the pixel on the right side of the seam.
+				if (x < edges[0].size()-1){
+					pixToUpdate = edges[y].get(x+1);
+					pixToUpdate.magnitude = updateMagnitude2(pixToUpdate, x+1);
 				}
 			}
 			this.logger.log("Finished updating Edges Matrix");
+		}
+
+		private int updateMagnitude2(Pixel pixel, int eX) {
+			int magnitude;
+			Pixel lPixel, rPixel, tPixel, bPixel;
+
+			// bottom right pixel
+			if (eX == edges[0].size()-1 && pixel.y == edges.length-1){
+				lPixel = edges[pixel.y].get(eX - 1);
+				tPixel = edges[pixel.y-1].get(eX);
+				magnitude = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x], 2)
+										 + (Math.pow(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+			}
+			// right side pixel
+			else if (eX == edges[0].size()-1){
+				lPixel = edges[pixel.y].get(eX - 1);
+				bPixel = edges[pixel.y+1].get(eX);
+				magnitude = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x], 2)
+										 + (Math.pow(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+			}
+			// bottom pixel
+			else if (pixel.y == edges.length-1){
+				rPixel = edges[pixel.y].get(eX + 1);
+				tPixel = edges[pixel.y-1].get(eX);
+				magnitude = (int) Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x], 2)
+										 + (Math.pow(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+			}
+			// any other pixel
+			else {
+				rPixel = edges[pixel.y].get(eX + 1);
+				bPixel = edges[pixel.y+1].get(eX);
+				magnitude = (int) Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x], 2)
+										 + (Math.pow(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x], 2)));
+			}
+			return magnitude;
 		}
 
 
@@ -195,39 +240,51 @@ public class SeamsCarver extends ImageProcessor {
 					// fill the first row without considering cl, cv of cr.
 					if (y == 0) continue;
 
-					int cl;
-					int cv;
-					int cr;
+					int cl, cv, cr;
+					Pixel curPixel = edges[y].get(x);
+					Pixel lPixel, tPixel ,rPixel;
 
 					//left most pixel in the row
 					if (x == 0) {
-						// find how to calc cv here
-						//cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
-						cr = (int) Math.sqrt(Math.pow(greyScale[y][x + 1] - greyScale[y - 1][x], 2));
+						rPixel = edges[y].get(x+1);
+						tPixel = edges[y-1].get(x);
+
+						// find how to calc cv here
+						// cv = (int)   Math.sqrt(Math.pow(this.greyScale[tvPixel.y][tvPixel.x] - greyScale[y][x+1], 2));
+
+						cr = (int) Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x], 2));
 
 						costMat[y][x] += Math.min(costMat[y - 1][x], costMat[y - 1][x + 1] + cr);
 					}
 					// right most pixel in the row
 					else if (x == costMat[0].length - 1) {
+						lPixel = edges[y].get(x-1);
+						tPixel = edges[y-1].get(x);
+
 						// find how to calc cv here
 						//cv = (int)   Math.sqrt(Math.pow(this.greyScale[y][x-1] - greyScale[y][x+1], 2));
 
-						cl = (int) Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y - 1][x], 2));
+						cl = (int) Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x], 2));
 
 						costMat[y][x] += Math.min(costMat[y - 1][x], costMat[y - 1][x - 1] + cl);
 					} else {
-						cl = (int) (Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y][x + 1], 2)) +
-							    	Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y - 1][x], 2)));
+						lPixel = edges[y].get(x-1);
+						tPixel = edges[y-1].get(x);
+						rPixel = edges[y].get(x+1);
 
-						cv = (int) Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y][x + 1], 2));
 
-						cr = (int) (Math.sqrt(Math.pow(greyScale[y][x - 1] - greyScale[y][x + 1], 2)) +
-								Math.sqrt(Math.pow(greyScale[y][x + 1] - greyScale[y - 1][x], 2)));
+						cl = (int) (Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x], 2)) +
+							    	Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[tPixel.y][tPixel.x], 2)));
+
+						cv = (int)  Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x], 2));
+
+						cr = (int) (Math.sqrt(Math.pow(greyScale[lPixel.y][lPixel.x] - greyScale[rPixel.y][rPixel.x], 2)) +
+									Math.sqrt(Math.pow(greyScale[rPixel.y][rPixel.x] - greyScale[tPixel.y][tPixel.x], 2)));
 
 						costMat[y][x] += Math.min(costMat[y - 1][x - 1] + cl,
-								Math.min(costMat[y - 1][x] + cv,
-										costMat[y - 1][x + 1] + cr));
+										 Math.min(costMat[y - 1][x] + cv,
+												  costMat[y - 1][x + 1] + cr));
 					}
 				}
 			}
