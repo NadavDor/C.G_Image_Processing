@@ -101,7 +101,7 @@ public class SeamsCarver extends ImageProcessor {
 	private int calcMagnitude(Pixel pixel) {
 		int magnitude;
 		if(pixel.y == inHeight -1 && pixel.x == inWidth -1 ) {
-			magnitude = (int)(Math.abs(this.greyScale[pixel.y][pixel.x-1]- this.greyScale[pixel.y][pixel.x]) + (Math.abs(this.greyScale[pixel.y-1][pixel.x] - this.greyScale[pixel.y][pixel.x]));
+			magnitude = (int)(Math.abs(this.greyScale[pixel.y][pixel.x-1]- this.greyScale[pixel.y][pixel.x]) + (Math.abs(this.greyScale[pixel.y-1][pixel.x] - this.greyScale[pixel.y][pixel.x])));
 		}
 		else {
 			if (pixel.x == inWidth - 1) {
