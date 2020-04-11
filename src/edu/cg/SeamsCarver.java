@@ -105,7 +105,7 @@ public class SeamsCarver extends ImageProcessor {
 		}
 		else {
 			if (pixel.x == inWidth - 1) {
-				magnitude = (int)(Math.abs((this.greyScale[pixel.y][pixel.x - 1] - this.greyScale[pixel.y][pixel.x], 2) + (Math.abs(this.greyScale[pixel.y + 1][pixel.x] - this.greyScale[pixel.y][pixel.x])));
+				magnitude = (int)(Math.abs((this.greyScale[pixel.y][pixel.x - 1] - this.greyScale[pixel.y][pixel.x]) + (Math.abs(this.greyScale[pixel.y + 1][pixel.x] - this.greyScale[pixel.y][pixel.x]))));
 			} else {
 				if (pixel.y == inHeight - 1) {
 					magnitude = (int)(Math.abs(this.greyScale[pixel.y][pixel.x + 1] - this.greyScale[pixel.y][pixel.x]) + (Math.abs(this.greyScale[pixel.y - 1][pixel.x] - this.greyScale[pixel.y][pixel.x])));
