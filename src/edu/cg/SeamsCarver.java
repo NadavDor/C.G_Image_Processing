@@ -348,6 +348,12 @@ public class SeamsCarver extends ImageProcessor {
         // TODO: Implement this method, remove the exception.
         logger.log("Preparing for reducingImageWidth");
         BufferedImage ans = newEmptyOutputSizedImage();
+        boolean[][] newImageMask = new boolean[outHeight][outWidth];
+
+        int r = rgbWeights.redWeight;
+        int g = rgbWeights.greenWeight;
+        int b = rgbWeights.blueWeight;
+        int max = rgbWeights.maxWeight;
 
         int removedCount;
         for (int y = 0; y < inHeight ; y++) {
@@ -355,7 +361,13 @@ public class SeamsCarver extends ImageProcessor {
             for (int x = 0; x < inWidth ; x++) {
                 if (!seamsMatrix[y][x]) {
                     Color c = new Color(workingImage.getRGB(x, y));
-                    ans.setRGB(x - removedCount, y, c.getRGB());
+                    int red = r * c.getRed() / max;
+                    int green = g * c.getGreen() / max;
+                    int blue = b * c.getBlue() / max;
+                    Color color = new Color(red, green, blue);
+
+                    ans.setRGB(x - removedCount, y, color.getRGB());
+                    newImageMask[y][x - removedCount] = imageMask[y][x];
                 } else {
                     removedCount++;
                     logger.log("x - removedCount = " + (x - removedCount) + "\n" +
@@ -365,6 +377,7 @@ public class SeamsCarver extends ImageProcessor {
             }
         }
 
+        this.imageMask = newImageMask;
         logger.log("reducingImageWidth done!");
         return ans;
 
@@ -387,8 +400,53 @@ public class SeamsCarver extends ImageProcessor {
 
     // duplicate each of the seams found in the DS from the original image.
     private BufferedImage increaseImageWidth() {
-        // TODO: Implement this method, remove the exception.
-        throw new UnimplementedMethodException("increaseImageWidth");
+        logger.log("Preparing for reducingImageWidth");
+        BufferedImage ans = newEmptyOutputSizedImage();
+        boolean[][] newImageMask = new boolean[outHeight][outWidth];
+
+        int r = rgbWeights.redWeight;
+        int g = rgbWeights.greenWeight;
+        int b = rgbWeights.blueWeight;
+        int max = rgbWeights.maxWeight;
+
+        int addedCount;
+        for (int y = 0; y < inHeight ; y++) {
+            addedCount = 0;
+            for (int x = 0; x < inWidth ; x++) {
+                if (!seamsMatrix[y][x]) {
+                    Color c = new Color(workingImage.getRGB(x, y));
+                    int red = r * c.getRed() / max;
+                    int green = g * c.getGreen() / max;
+                    int blue = b * c.getBlue() / max;
+                    Color color = new Color(red, green, blue);
+
+
+                    ans.setRGB(x + addedCount, y, color.getRGB());
+                    newImageMask[y][x + addedCount] = imageMask[y][x];
+                } else {
+                    Color c = new Color(workingImage.getRGB(x, y));
+                    int red = r * c.getRed() / max;
+                    int green = g * c.getGreen() / max;
+                    int blue = b * c.getBlue() / max;
+                    Color color = new Color(red, green, blue);
+
+                    ans.setRGB(x + addedCount, y, color.getRGB());
+                    ans.setRGB(x + 1 + addedCount, y, color.getRGB());
+
+                    newImageMask[y][x + addedCount] = imageMask[y][x];
+                    newImageMask[y][x + 1 + addedCount] = imageMask[y][x];
+
+                    addedCount++;
+
+                    logger.log("x - removedCount = " + (x - addedCount) + "\n" +
+                            "y = " + y );
+                }
+            }
+        }
+
+        this.imageMask = newImageMask;
+        logger.log("reducingImageWidth done!");
+        return ans;
     }
 
     public BufferedImage showSeams(int seamColorRGB) {
@@ -405,10 +463,6 @@ public class SeamsCarver extends ImageProcessor {
         // corresponding pixels.
         // HINT: Once you remove (replicate) the chosen seams from the input image, you
         // need to also remove (replicate) the matching entries from the mask as well.
-
-        forEach((y, x) -> {
-            imageMask[y][x] = !seamsMatrix[y][x];
-        });
 
         return imageMask;
         //throw new UnimplementedMethodException("getMaskAfterSeamCarving");
