@@ -370,9 +370,6 @@ public class SeamsCarver extends ImageProcessor {
                     newImageMask[y][x - removedCount] = imageMask[y][x];
                 } else {
                     removedCount++;
-                    logger.log("x - removedCount = " + (x - removedCount) + "\n" +
-                                    "y = " + y );
-
                 }
             }
         }
@@ -380,22 +377,6 @@ public class SeamsCarver extends ImageProcessor {
         this.imageMask = newImageMask;
         logger.log("reducingImageWidth done!");
         return ans;
-
-
-//        BufferedImage ans = newEmptyInputSizedImage();
-//
-//        forEach((y, x) -> {
-//            if (seamsMatrix[y][x]) {
-//                Color c = new Color(255, 0, 0);
-//                ans.setRGB(x, y, c.getRGB());
-//            } else {
-//                Color c = new Color(workingImage.getRGB(x, y));
-//                ans.setRGB(x, y, c.getRGB());
-//            }
-//        });
-//
-//        logger.log("reducingImageWidth done!");
-//        return ans;
     }
 
     // duplicate each of the seams found in the DS from the original image.
@@ -464,7 +445,7 @@ public class SeamsCarver extends ImageProcessor {
         // HINT: Once you remove (replicate) the chosen seams from the input image, you
         // need to also remove (replicate) the matching entries from the mask as well.
 
-        return imageMask;
+        return this.imageMask;
         //throw new UnimplementedMethodException("getMaskAfterSeamCarving");
     }
 
