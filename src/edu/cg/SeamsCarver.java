@@ -248,7 +248,7 @@ public class SeamsCarver extends ImageProcessor {
         }
 
         this.lastSeam[lastSeam.length - 1] = xIndex;
-        this.seamsMatrix[lastSeam.length - 1][xIndex] = true;
+        this.seamsMatrix[lastSeam.length - 1][ edges[lastSeam.length - 1].get(xIndex).x ] = true;
 
         int nextXIndex = 0;
         Pixel nextPixel = new Pixel(0, 0);
@@ -329,7 +329,12 @@ public class SeamsCarver extends ImageProcessor {
             }
 
             this.lastSeam[y - 1] = nextXIndex;
-            this.seamsMatrix[y - 1][nextPixel.x] = true;
+
+            if(this.seamsMatrix[y - 1][ edges[y-1].get(nextXIndex).x ]){
+                System.out.println("buggg");
+            }else {
+                this.seamsMatrix[y - 1][ edges[y-1].get(nextXIndex).x ] = true;
+            }
             xIndex = nextXIndex;
         }
     }
@@ -342,20 +347,42 @@ public class SeamsCarver extends ImageProcessor {
     private BufferedImage reduceImageWidth() {
         // TODO: Implement this method, remove the exception.
         logger.log("Preparing for reducingImageWidth");
-        BufferedImage ans = newEmptyInputSizedImage();
+        BufferedImage ans = newEmptyOutputSizedImage();
 
-        forEach((y, x) -> {
-            if (seamsMatrix[y][x]) {
-                Color c = new Color(255, 0, 0);
-                ans.setRGB(x, y, c.getRGB());
-            } else {
-                Color c = new Color(workingImage.getRGB(x, y));
-                ans.setRGB(x, y, c.getRGB());
+        int removedCount;
+        for (int y = 0; y < inHeight ; y++) {
+            removedCount = 0;
+            for (int x = 0; x < inWidth ; x++) {
+                if (!seamsMatrix[y][x]) {
+                    Color c = new Color(workingImage.getRGB(x, y));
+                    ans.setRGB(x - removedCount, y, c.getRGB());
+                } else {
+                    removedCount++;
+                    logger.log("x - removedCount = " + (x - removedCount) + "\n" +
+                                    "y = " + y );
+
+                }
             }
-        });
+        }
 
         logger.log("reducingImageWidth done!");
         return ans;
+
+
+//        BufferedImage ans = newEmptyInputSizedImage();
+//
+//        forEach((y, x) -> {
+//            if (seamsMatrix[y][x]) {
+//                Color c = new Color(255, 0, 0);
+//                ans.setRGB(x, y, c.getRGB());
+//            } else {
+//                Color c = new Color(workingImage.getRGB(x, y));
+//                ans.setRGB(x, y, c.getRGB());
+//            }
+//        });
+//
+//        logger.log("reducingImageWidth done!");
+//        return ans;
     }
 
     // duplicate each of the seams found in the DS from the original image.
