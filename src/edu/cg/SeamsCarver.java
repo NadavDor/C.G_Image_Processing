@@ -119,59 +119,19 @@ public class SeamsCarver extends ImageProcessor {
         for (int y = 0; y < lastSeam.length; y++) {
             int x = lastSeam[y];
 
-            Pixel pixToUpdate;
             // the pixel on the left side of the seam.
             if (x > 0) {
-//                pixToUpdate = edges[y].get(x - 1);
-//                pixToUpdate.magnitude = updateMagnitude2(pixToUpdate, x - 1);
                 edges[y].get(x - 1).calcPixelEnergy(x - 1);
             }
             // the pixel on the right side of the seam.
             //NOTE: as we deceased the width of edges by 1 the pixel
             // to the right of the seam in on  and not x+1
             if (x < edges[0].size() - 1) {
-//                pixToUpdate = edges[y].get(x + 1);
-//                pixToUpdate.magnitude = updateMagnitude2(pixToUpdate, x + 1);
                 edges[y].get(x).calcPixelEnergy(x);
             }
         }
         this.logger.log("Finished updating Edges Matrix");
     }
-
-    private int updateMagnitude2(Pixel pixel, int eX) {
-        int magnitude;
-        Pixel lPixel, rPixel, tPixel, bPixel;
-
-        // bottom right pixel
-        if (eX == edges[0].size() - 1 && pixel.y == edges.length - 1) {
-            lPixel = edges[pixel.y].get(eX - 1);
-            tPixel = edges[pixel.y - 1].get(eX);
-            magnitude = (int) (Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x])
-                    + Math.abs(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x]));
-        }
-        // right side pixel
-        else if (eX == edges[0].size() - 1) {
-            lPixel = edges[pixel.y].get(eX - 1);
-            bPixel = edges[pixel.y + 1].get(eX);
-            magnitude = (int) (Math.abs(greyScale[lPixel.y][lPixel.x] - greyScale[pixel.y][pixel.x])
-                    + Math.abs(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x]));
-        }
-        // bottom pixel
-        else if (pixel.y == edges.length - 1) {
-            rPixel = edges[pixel.y].get(eX + 1);
-            tPixel = edges[pixel.y - 1].get(eX);
-            magnitude = (int) (Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x]) + Math.abs(greyScale[tPixel.y][tPixel.x] - greyScale[pixel.y][pixel.x]));
-        }
-        // any other pixel
-        else {
-            rPixel = edges[pixel.y].get(eX + 1);
-            bPixel = edges[pixel.y + 1].get(eX);
-            magnitude = (int) (Math.abs(greyScale[rPixel.y][rPixel.x] - greyScale[pixel.y][pixel.x])
-                    + (Math.abs(greyScale[bPixel.y][bPixel.x] - greyScale[pixel.y][pixel.x])));
-        }
-        return magnitude;
-    }
-
 
     /*find a minimal seam using the edges matrix
      and store it in the DS.
@@ -251,7 +211,6 @@ public class SeamsCarver extends ImageProcessor {
         this.seamsMatrix[lastSeam.length - 1][ edges[lastSeam.length - 1].get(xIndex).x ] = true;
 
         int nextXIndex = 0;
-        Pixel nextPixel = new Pixel(0, 0);
         Pixel curPixel, lPixel, tPixel, rPixel;
         for (int y = costMat.length - 1; y > 0; y--) {
 
@@ -274,17 +233,14 @@ public class SeamsCarver extends ImageProcessor {
                 //check the upper-left
                 if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex - 1] + cl)) {
                     nextXIndex = xIndex - 1;
-                    nextPixel = lPixel;
                 }
                 //check the top
                 else if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex] + cv)) {
                     nextXIndex = xIndex;
-                    nextPixel = tPixel;
                 }
                 // upper-right
                 else if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex + 1] + cr)) {
                     nextXIndex = xIndex + 1;
-                    nextPixel = rPixel;
                 } else {
                     System.out.println("trace back could't find a way up");
                 }
@@ -298,12 +254,10 @@ public class SeamsCarver extends ImageProcessor {
                 // check the top
                 if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex])) {
                     nextXIndex = xIndex;
-                    nextPixel = tPixel;
                 }
                 // upper-right
                 else if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex + 1] + cr)) {
                     nextXIndex = xIndex + 1;
-                    nextPixel = rPixel;
                 } else {
                     System.out.println("trace back could't find a way up");
                 }
@@ -317,12 +271,10 @@ public class SeamsCarver extends ImageProcessor {
                 // check the top
                 if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex])) {
                     nextXIndex = xIndex;
-                    nextPixel = tPixel;
                 }
                 // top-left
                 else if (costMat[y][xIndex] == (curPixel.getPixelEnergy() + costMat[y - 1][xIndex - 1] + cl)) {
                     nextXIndex = xIndex - 1;
-                    nextPixel = lPixel;
                 } else {
                     System.out.println("trace back could't find a way up");
                 }
@@ -345,7 +297,6 @@ public class SeamsCarver extends ImageProcessor {
 
     // delete all the seams found in the DS from the original image.
     private BufferedImage reduceImageWidth() {
-        // TODO: Implement this method, remove the exception.
         logger.log("Preparing for reducingImageWidth");
         BufferedImage ans = newEmptyOutputSizedImage();
         boolean[][] newImageMask = new boolean[outHeight][outWidth];
@@ -431,22 +382,25 @@ public class SeamsCarver extends ImageProcessor {
     }
 
     public BufferedImage showSeams(int seamColorRGB) {
-        // TODO: Implement this method (bonus), remove the exception.
-        throw new UnimplementedMethodException("showSeams");
+        logger.log("Preparing for showSeams");
+        BufferedImage ans = newEmptyInputSizedImage();
+
+        forEach((y, x) -> {
+            if (seamsMatrix[y][x]) {
+                Color c = new Color(seamColorRGB);
+                ans.setRGB(x, y, c.getRGB());
+            } else {
+                Color c = new Color(workingImage.getRGB(x, y));
+                ans.setRGB(x, y, c.getRGB());
+            }
+        });
+
+        logger.log("showSeams done!");
+        return ans;
     }
 
     public boolean[][] getMaskAfterSeamCarving() {
-        // TODO: Implement this method, remove the exception.
-        // This method should return the mask of the resize image after seam carving.
-        // Meaning, after applying Seam Carving on the input image,
-        // getMaskAfterSeamCarving() will return a mask, with the same dimensions as the
-        // resized image, where the mask values match the original mask values for the
-        // corresponding pixels.
-        // HINT: Once you remove (replicate) the chosen seams from the input image, you
-        // need to also remove (replicate) the matching entries from the mask as well.
-
         return this.imageMask;
-        //throw new UnimplementedMethodException("getMaskAfterSeamCarving");
     }
 
     class Pixel {

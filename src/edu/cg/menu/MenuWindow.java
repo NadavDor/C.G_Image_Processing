@@ -244,9 +244,6 @@ public class MenuWindow extends JFrame implements Logger {
 
 	public void removeObjectFromImage(boolean[][] srcMask) {
 
-//		// TODO: Implement this method, remove the exception.
-//		throw new UnimplementedMethodException("removeObjectFromImage");
-
 		RGBWeights rgbWeights = colorMixer.getRGBWeights();
 		BufferedImage curImg = duplicateImage();
 		boolean[][] curMask = duplicateMask();
@@ -270,12 +267,11 @@ public class MenuWindow extends JFrame implements Logger {
 			SeamsCarver sc = new SeamsCarver(this, curImg, curWidth - numOfSeams, rgbWeights, curMask);
 			curImg = sc.resize();
 
-			//present(curImg, "Image After Object Removal");
-
 			curMask = sc.getMaskAfterSeamCarving();
 			curWidth -= numOfSeams;
 
 			//find the max number of true in row
+			maxTrueInRow = 0;
 			for (int y = 0; y < curMask.length ; y++) {
 				rowCount = 0;
 				for (int x = 0; x < curMask[0].length ; x++) {
@@ -288,12 +284,8 @@ public class MenuWindow extends JFrame implements Logger {
 		// increase the img width
 		SeamsCarver sc = new SeamsCarver(this, curImg, srcMask[0].length , rgbWeights, curMask);
 		curImg = sc.resize();
-		//curMask = sc.getMaskAfterSeamCarving();
 
-		// TODO: After completing the implementation - make sure you present the result.
-		// Just uncomment the following line, and replace 'result' with your
-		// result variable.
-		 present(curImg, "Image After Object Removal");
+		present(curImg, "Image After Object Removal");
 	}
 
 	public void maskImage() {
