@@ -1,0 +1,1 @@
+We implemented the bonus task of showSeams()
