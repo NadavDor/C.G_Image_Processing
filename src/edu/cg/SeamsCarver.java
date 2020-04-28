@@ -109,7 +109,6 @@ public class SeamsCarver extends ImageProcessor {
 
 
     private void updateEdgeMatrix() {
-        this.logger.log("updating Edges Matrix");
         //remove seam from edges matrix
         for (int i = 0; i < lastSeam.length; i++) {
             this.edges[i].remove(lastSeam[i]);
@@ -130,7 +129,6 @@ public class SeamsCarver extends ImageProcessor {
                 edges[y].get(x).calcPixelEnergy(x);
             }
         }
-        this.logger.log("Finished updating Edges Matrix");
     }
 
     /*find a minimal seam using the edges matrix
@@ -281,12 +279,7 @@ public class SeamsCarver extends ImageProcessor {
             }
 
             this.lastSeam[y - 1] = nextXIndex;
-
-            if(this.seamsMatrix[y - 1][ edges[y-1].get(nextXIndex).x ]){
-                System.out.println("buggg");
-            }else {
-                this.seamsMatrix[y - 1][ edges[y-1].get(nextXIndex).x ] = true;
-            }
+            this.seamsMatrix[y - 1][ edges[y-1].get(nextXIndex).x ] = true;
             xIndex = nextXIndex;
         }
     }
@@ -369,9 +362,6 @@ public class SeamsCarver extends ImageProcessor {
                     newImageMask[y][x + 1 + addedCount] = imageMask[y][x];
 
                     addedCount++;
-
-                    logger.log("x - removedCount = " + (x - addedCount) + "\n" +
-                            "y = " + y );
                 }
             }
         }
